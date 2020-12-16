@@ -1,6 +1,7 @@
 <?php
 
 class Producto {
+
        //Variables
        private $id;
        private $categoria_id;
@@ -12,12 +13,12 @@ class Producto {
        private $fecha;
        private $imagen;
        private $db;
-       
+
        //Constructor
        function __construct() {
               $this->db = Database::connect();
        }
-       
+
        //Getters and Setters
        function getId() {
               return $this->id;
@@ -64,23 +65,23 @@ class Producto {
        }
 
        function setNombre($nombre): void {
-              $this->nombre = $nombre;
+              $this->nombre = $this->db->real_escape_string($nombre);
        }
 
        function setDescripcion($descripcion): void {
-              $this->descripcion = $descripcion;
+              $this->descripcion = $this->db->real_escape_string($descripcion);
        }
 
        function setPrecio($precio): void {
-              $this->precio = $precio;
+              $this->precio = $this->db->real_escape_string($precio);
        }
 
        function setStock($stock): void {
-              $this->stock = $stock;
+              $this->stock = $this->db->real_escape_string($stock);
        }
 
        function setOferta($oferta): void {
-              $this->oferta = $oferta;
+              $this->oferta = $this->db->real_escape_string($oferta);
        }
 
        function setFecha($fecha): void {
@@ -97,5 +98,49 @@ class Producto {
               return $productos;
        }
 
-       
+       public function getOne() {
+              $producto = $this->db->query("SELECT *FROM productos WHERE id = {$this->getId()};");
+              return $producto->fetch_object();
+       }
+
+       public function save() {
+              $sql = "INSERT INTO productos VALUES (NULL, '{$this->getCategoria_id()}', '{$this->getNombre()}', '{$this->getDescripcion()}', {$this->getPrecio()}, {$this->getStock()}, null, CURDATE(), '{$this->getImagen()}');";
+              $save = $this->db->query($sql);
+
+              $result = false;
+              if ($save) {
+                     $result = true;
+              }
+              return $result;
+       }
+
+       public function edit() {
+              $sql = "UPDATE productos SET categoria_id= {$this->getCategoria_id()}, nombre='{$this->getNombre()}', descripcion='{$this->getDescripcion()}', precio={$this->getPrecio()}, stock={$this->getStock()} ";
+              
+              if ($this->getImagen() != null) {
+                     $sql .= ",  imagen='{$this->getImagen()}'";
+              }
+              
+              $sql .= " WHERE id={$this->id}";
+         
+              $save = $this->db->query($sql);
+                      
+              $result = false;
+              if ($save) {
+                     $result = true;
+              }
+              return $result;
+       }
+
+       public function delete() {
+              $sql = "DELETE FROM productos WHERE id={$this->id}";
+              $delete = $this->db->query($sql);
+
+              $result = false;
+              if ($delete) {
+                     $result = true;
+              }
+              return $result;
+       }
+
 }
