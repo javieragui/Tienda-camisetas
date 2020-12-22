@@ -5,9 +5,23 @@ require_once 'models/Producto.php';
 class ProductoController {
 
        public function index() {
+              $producto = new Producto();
+              $productos = $producto->getRandom(6);
 
               //Renderizar una vista
-              require_once 'views/producto/destacados.html';
+              require_once 'views/producto/destacados.phtml';
+       }
+
+       public function ver() {
+              if (isset($_GET['id'])) {
+                     $id = $_GET['id'];
+
+                     $producto = new Producto();
+                     $producto->setId($id);
+
+                     $prod = $producto->getOne();
+              }
+              require_once 'views/producto/ver.phtml';
        }
 
        public function gestion() {
@@ -43,7 +57,7 @@ class ProductoController {
                             $producto->setCategoria_id($categoria);
 
                             //Guardar Imagen
-                            if(isset($_FILES['imagen'])) {
+                            if (isset($_FILES['imagen'])) {
                                    $file = $_FILES['imagen'];
                                    $filename = $file['name'];
                                    $mimetype = $file['type'];
@@ -58,15 +72,15 @@ class ProductoController {
                                           $producto->setImagen($filename);
                                    }
                             }
-                            if(isset($_GET['id'])) {
+                            if (isset($_GET['id'])) {
                                    $id = $_GET['id'];
                                    $producto->setId($id);
-                                   
+
                                    $save = $producto->edit();
                             } else {
                                    $save = $producto->save();
                             }
-                            
+
                             if ($save) {
                                    $_SESSION['producto'] = "complete";
                             } else {
